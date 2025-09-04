@@ -1,0 +1,11 @@
+export function generateShortcode() {
+  return Math.random().toString(36).substring(2, 7);
+}
+export function logEvent(message, data = {}) {
+  const log = {
+    timestamp: new Date().toISOString(),
+    message,
+    data
+  };
+  localStorage.setItem(`log_${Date.now()}`, JSON.stringify(log));
+}

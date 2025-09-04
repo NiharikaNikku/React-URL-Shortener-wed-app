@@ -1,0 +1,59 @@
+import { useState } from 'react';
+import { generateShortcode } from '../utils/generateShortcode';
+import { logEvent } from '../utils/logger';
+import { generateShortcode } from '../utils/generateShortcode';
+import { logEvent } from '../utils/logger';
+
+function ShortenerForm() {
+  const [originalUrl, setOriginalUrl] = useState('');
+  const [validity, setValidity] = useState('');
+  const [customCode, setCustomCode] = useState('');
+  const [shortened, setShortened] = useState(null);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const code = customCode || generateShortcode();
+    const expiry = Date.now() + (validity ? validity : 30) * 60 * 1000;
+
+    const data = {
+      originalUrl,
+      shortcode: code,
+      expiry
+    };
+
+    localStorage.setItem(code, JSON.stringify(data));
+    logEvent('Shortened URL created', data);
+    setShortened(`http://localhost:3000/${code}`);
+  };
+
+  return (
+    <div>
+      <h2>URL Shortener</h2>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Enter original URL"
+          value={originalUrl}
+          onChange={(e) => setOriginalUrl(e.target.value)}
+          required
+        />
+        <input
+          type="number"
+          placeholder="Validity (minutes)"
+          value={validity}
+          onChange={(e) => setValidity(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Custom shortcode (optional)"
+          value={customCode}
+          onChange={(e) => setCustomCode(e.target.value)}
+        />
+        <button type="submit">Shorten</button>
+      </form>
+      {shortened && <p>Shortened URL: <a href={shortened}>{shortened}</a></p>}
+    </div>
+  );
+}
+
+export default ShortenerForm;
